@@ -18,6 +18,7 @@ type
   TKey = class(TImage)
   private
     FRound: byte;
+    FPicChangedCount: byte;
     FPicture: TPicture;
     FUpLabel: TMyLabel;
     FDownLabel: TMyLabel;
@@ -29,12 +30,14 @@ type
     FKeyType: TKeyType;
     FHeight: Integer;
     FWidth: Integer;
+    FPicLoaded: TBitmap;
     hover: boolean;
     procedure Paint(AColor: TColor);
-
+    procedure CopyKey;
     //procedure UpFontChange(Sender: TObject);
     //procedure DownFontChange(Sender: TObject);
     procedure MidFontChange(Sender: TObject);
+    procedure PictureChanged(Sender: TObject);
     //procedure PaintLabel(const Index:Integer); overload;
     //procedure PaintLabel(const Index: Integer; AColor: Tcolor);
     procedure MakeBlack;
@@ -96,10 +99,21 @@ end;
 
 { TKey }
 
+procedure TKey.CopyKey;
+begin
+   with FPicLoaded.Canvas do
+   begin
+    Width:=Self.Width; height:=self.Height;
+    CopyRect(Rect(0,0,width, height), self.Canvas,Rect(0,0,self.Width,self.Height))
+   end;
+end;
+
 constructor TKey.Create(AOwner: TComponent);
 begin
+  FPicLoaded:=TBitmap.Create;
   inherited;
   hover:=false;
+  FPicChangedCount:=0;
   Fheight:=42; Fwidth:=42;
   SetBounds(0,0,Fwidth,fheight);
   //SetHeight(42); SetWidth(42);
@@ -108,10 +122,12 @@ begin
   FUpLabel.Font:=TFont.Create;
   FDownLabel.Font:=TFont.Create;
   FMidLabel.Font:=TFont.Create;
+
   //FUpLabel.Font.OnChange := Self.UpFontChange;
   FUpLabel.Font.OnChange := Self.MidFontChange;
   FMidLabel.Font.OnChange := Self.MidFontChange;
   FDownLabel.Font.OnChange := Self.MidFontChange;
+  Picture.OnChange := self.PictureChanged;
   //FDownLabel.Font.OnChange := Self.DownFontChange;
   with FUpLabel do
   begin
@@ -142,6 +158,7 @@ begin
   {FUpLabel.Font.Free;
   FDownLabel.Font.Free;
   FMidLabel.Font.Free;}
+  FPicLoaded.Free;
   inherited;
 end;
 
@@ -247,6 +264,16 @@ begin
           TextOut(5, midPos, s);
         end;
 end;
+end;
+
+procedure TKey.PictureChanged(Sender: TObject);
+begin
+  if FPicChangedCount<3 then inc(FPicChangedCount);
+  if FPicChangedCount=3 then
+  begin
+    //CopyKey;
+    inc(FPicChangedCount);
+  end;
 end;
 
 procedure TKey.ReturnColors;
