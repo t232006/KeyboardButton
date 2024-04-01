@@ -9,8 +9,8 @@ uses
 type
   TForm1 = class(TForm)
     Button1: TButton;
-    Key1: TKey;
     Button2: TButton;
+    Key1: TKey;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
   private

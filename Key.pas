@@ -19,7 +19,7 @@ type
   private
     FRound: byte;
     FPicChangedCount: byte;
-    FPicture: TPicture;
+    //FPicture: TPicture;
     FUpLabel: TMyLabel;
     FDownLabel: TMyLabel;
     FMidLabel: TMyLabel;
@@ -30,7 +30,7 @@ type
     FKeyType: TKeyType;
     FHeight: Integer;
     FWidth: Integer;
-    FPicLoaded: TBitmap;
+
     hover: boolean;
     procedure Paint(AColor: TColor);
     procedure CopyKey;
@@ -61,11 +61,13 @@ type
     procedure MouseDown(var Msg: TMessage); message WM_LBUTTONDOWN;
     procedure MouseUp(var Msg: TMessage); message WM_LBUTTONUP;
   public
+    FPicLoaded: array of TBitmap;//!!!!!!!!!!!!!!!!!!!!!
     constructor Create(AOwner: TComponent);  override;
     destructor Destroy; override;
     property OnClick;
     property OnMouseEnter;
     property OnMouseLeave;
+
   published
     //property Font;
     property Color;
@@ -101,22 +103,26 @@ end;
 
 procedure TKey.CopyKey;
 begin
-   with FPicLoaded.Canvas do
+   setlength(FPicLoaded, length(FPicLoaded)+1);
+   FPicLoaded[FPicChangedcount]:=TBitmap.Create;
+   with FPicLoaded[FPicChangedcount].Canvas do
    begin
     Width:=Self.Width; height:=self.Height;
-    CopyRect(Rect(0,0,width, height), self.Canvas,Rect(0,0,self.Width,self.Height))
+    CopyRect(Rect(0,0,width, height),
+            self.Canvas,
+            Rect(0,0,self.Width,self.Height))
    end;
+   inc(FPicChangedcount);
 end;
 
 constructor TKey.Create(AOwner: TComponent);
 begin
-  FPicLoaded:=TBitmap.Create;
+  //FPicLoaded:=TBitmap.Create;
   inherited;
   hover:=false;
   FPicChangedCount:=0;
   Fheight:=42; Fwidth:=42;
   SetBounds(0,0,Fwidth,fheight);
-  //SetHeight(42); SetWidth(42);
   round:=4;
   Color:= RGB(49,48,49);
   FUpLabel.Font:=TFont.Create;
@@ -128,7 +134,6 @@ begin
   FMidLabel.Font.OnChange := Self.MidFontChange;
   FDownLabel.Font.OnChange := Self.MidFontChange;
   Picture.OnChange := self.PictureChanged;
-  //FDownLabel.Font.OnChange := Self.DownFontChange;
   with FUpLabel do
   begin
     Font.Size:=14; Font.Color:=clWhite; Font.Style:=[fsItalic];
@@ -158,19 +163,9 @@ begin
   {FUpLabel.Font.Free;
   FDownLabel.Font.Free;
   FMidLabel.Font.Free;}
-  FPicLoaded.Free;
+  //FPicLoaded.Free;
   inherited;
 end;
-
-{procedure TKey.DownFontChange(Sender: TObject);
-begin
-    SetFont(1, FDownLabel.Font);
-end;
-
-procedure TKey.UpFontChange(Sender: TObject);
-begin
-    SetFont(0, FUpLabel.Font);
-end;      }
 
 function TKey.GetFont(const Index: Integer): TFont;
 begin
@@ -187,7 +182,6 @@ begin
   case Index of
   0: result:=FupLabel.PosX;
   1: result:=FDownLabel.PosX;
-  //2: result:=FMidLabel.PosX;
   end;
 end;
 
@@ -268,10 +262,10 @@ end;
 
 procedure TKey.PictureChanged(Sender: TObject);
 begin
-  if FPicChangedCount<3 then inc(FPicChangedCount);
-  if FPicChangedCount=3 then
+  //if FPicChangedCount<3 then inc(FPicChangedCount);
+  //if FPicChangedCount=3 then
   begin
-    //CopyKey;
+    CopyKey;
     inc(FPicChangedCount);
   end;
 end;
@@ -314,17 +308,11 @@ begin
     Paint(Color);
 end;
 
-{procedure TKey.SetPicture(Value: TPicture);
-begin
-  FPicture.Assign(Value);
-end;}
-
 procedure TKey.SetPosX(const Index, Value: Integer);
 begin
     case Index of
       0: FUpLabel.PosX:=Value;
       1: FDownLabel.PosX:=Value;
-      //2: FMidLabel.PosX:=Value;
     end;
     Paint(Color);
 end;

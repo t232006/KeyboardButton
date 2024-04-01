@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>1899.12.30 00:00:00.000.334,=Z:\Программирование\repos\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.723,Z:\Программирование\repos\Unit1.pas=Z:\Программирование\repos\My components\keyboardButton\Unit1.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.297,=Z:\Программирование\repos\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.723,Z:\Программирование\repos\My components\keyboardButton\Unit1.pas=Z:\Программирование\repos\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.074,Z:\Программирование\repos\My components\keyboardButton\Project1.dproj=Z:\Программирование\repos\Project1.dproj</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.723,Z:\Программирование\repos\My components\keyboardButton\Unit1.dfm=Z:\Программирование\repos\Unit1.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.334,=Z:\Программирование\repos\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.723,Z:\Программирование\repos\Unit1.dfm=Z:\Программирование\repos\My components\keyboardButton\Unit1.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.074,Z:\Программирование\repos\Project1.dproj=Z:\Программирование\repos\My components\keyboardButton\Project1.dproj</Transaction>
   </Transactions>
 </BorlandProject>

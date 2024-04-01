@@ -12,8 +12,8 @@ object Form1: TForm1
   Font.Style = []
   TextHeight = 15
   object Key1: TKey
-    Left = 208
-    Top = 120
+    Left = 216
+    Top = 216
     AutoSize = True
     Picture.Data = {
       07544269746D6170C61B0000424DC61B00000000000036000000280000002A00
