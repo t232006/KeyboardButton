@@ -3,8 +3,8 @@ object Form1: TForm1
   Top = 0
   Caption = 'Form1'
   ClientHeight = 441
-  ClientWidth = 624
-  Color = clBtnFace
+  ClientWidth = 814
+  Color = clOlive
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -12,9 +12,8 @@ object Form1: TForm1
   Font.Style = []
   TextHeight = 15
   object Key1: TKey
-    Left = 216
-    Top = 216
-    AutoSize = True
+    Left = 248
+    Top = 128
     Picture.Data = {
       07544269746D6170C61B0000424DC61B00000000000036000000280000002A00
       00002A0000000100200000000000901B00000000000000000000000000000000

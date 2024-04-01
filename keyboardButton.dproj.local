@@ -4,11 +4,15 @@
     <Transaction>1899.12.30 00:00:00.000.940,=rtl.dcp</Transaction>
     <Transaction>1899.12.30 00:00:00.000.413,=vcl.dcp</Transaction>
     <Transaction>1899.12.30 00:00:00.000.604,=xmlrtl.dcp</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.584,Z:\Программирование\repos\keyboardButton.dproj=Z:\Программирование\repos\My components\keyboardButton\keyboardButton.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.584,Z:\Программирование\repos\My components\keyboardButton\keyboardButton.dproj=Z:\Программирование\repos\keyboardButton.dproj</Transaction>
     <Transaction>1899.12.30 00:00:00.000.028,=Z:\Программирование\repos\My components\keyboardButton\Key.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.466,=vclactnband.dcp</Transaction>
     <Transaction>1899.12.30 00:00:00.000.325,=designide.dcp</Transaction>
     <Transaction>1899.12.30 00:00:00.000.276,=Z:\Программирование\repos\My components\keyboardKey\Key.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.520,=vclx.dcp</Transaction>
+    <Transaction>2024.04.02 02:44:08.380,=Z:\Программирование\repos\My components\KeyboardButton\Unit1.pas</Transaction>
+    <Transaction>2024.04.02 03:22:27.976,Z:\Программирование\repos\My components\KeyboardButton\Unit1.pas=</Transaction>
+    <Transaction>2024.04.02 03:22:47.815,=Z:\Программирование\repos\My components\KeyboardButton\Unit1.pas</Transaction>
+    <Transaction>2024.04.02 03:25:18.268,Z:\Программирование\repos\My components\KeyboardButton\Unit1.pas=</Transaction>
   </Transactions>
 </BorlandProject>

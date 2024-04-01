@@ -18,7 +18,7 @@ type
   TKey = class(TImage)
   private
     FRound: byte;
-    FPicChangedCount: byte;
+    FPicChangedCount: integer;
     //FPicture: TPicture;
     FUpLabel: TMyLabel;
     FDownLabel: TMyLabel;
@@ -105,10 +105,10 @@ procedure TKey.CopyKey;
 begin
    setlength(FPicLoaded, length(FPicLoaded)+1);
    FPicLoaded[FPicChangedcount]:=TBitmap.Create;
-   with FPicLoaded[FPicChangedcount].Canvas do
+   with FPicLoaded[FPicChangedcount] do
    begin
     Width:=Self.Width; height:=self.Height;
-    CopyRect(Rect(0,0,width, height),
+    canvas.CopyRect(Rect(0,0,width, height),
             self.Canvas,
             Rect(0,0,self.Width,self.Height))
    end;
@@ -147,7 +147,7 @@ begin
   FMidLabel.Font:=FUpLabel.Font;
   FPressColor:=RGB(214,186,140);
   FMidLabel.Caption:='Esc';
-  AutoSize:=true;
+  //AutoSize:=true;
   Stretch:=true;
   //FUpLabel.Caption:='Q';
   //FDownLabel.Caption:='é';
@@ -265,8 +265,8 @@ begin
   //if FPicChangedCount<3 then inc(FPicChangedCount);
   //if FPicChangedCount=3 then
   begin
-    CopyKey;
-    inc(FPicChangedCount);
+    if not(csDesigning in ComponentState) then CopyKey;
+    //inc(FPicChangedCount);
   end;
 end;
 
