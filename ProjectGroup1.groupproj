@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{FB800EC6-E22C-4CFB-B513-6C81E05CD83A}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="keyboardButton.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Project1.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="keyboardButton">
+        <MSBuild Projects="keyboardButton.dproj"/>
+    </Target>
+    <Target Name="keyboardButton:Clean">
+        <MSBuild Projects="keyboardButton.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="keyboardButton:Make">
+        <MSBuild Projects="keyboardButton.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Project1">
+        <MSBuild Projects="Project1.dproj"/>
+    </Target>
+    <Target Name="Project1:Clean">
+        <MSBuild Projects="Project1.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Project1:Make">
+        <MSBuild Projects="Project1.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="keyboardButton;Project1"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="keyboardButton:Clean;Project1:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="keyboardButton:Make;Project1:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

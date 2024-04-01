@@ -1,0 +1,40 @@
+unit Unit1;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Key, Vcl.StdCtrls;
+
+type
+  TForm1 = class(TForm)
+    Button1: TButton;
+    Key1: TKey;
+    Key2: TKey;
+    Key3: TKey;
+    procedure Button1Click(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.dfm}
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+  //key1.Width:=42; key1.Height:=42;
+  canvas.CopyRect(Rect(10,10,key3.FPicLoaded.Width+10,Key1.FPicLoaded.Height+10),
+                  key1.FPicLoaded.Canvas,
+                  Rect(0,0,key1.FPicLoaded.Width, key1.FPicLoaded.Height));
+  canvas.CopyRect(Rect(110,10,key3.Width+110, key1.Height+10),
+                  key1.picture.Bitmap.Canvas,
+                  Rect(0,0,key1.Width, key1.Height))   ;
+end;
+
+end.
