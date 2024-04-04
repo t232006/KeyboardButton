@@ -1,4 +1,4 @@
-unit Key2;
+unit Key;
 
 interface
 
@@ -32,7 +32,8 @@ type
     FCurrentColor: TColor;
     procedure MakeBlack;
     procedure ReturnColors;
-    procedure DrawPicture;
+    function DrawPicture: boolean;
+    procedure DrawText;
     procedure SetPicture(Value: TBitmap);
     procedure Paint; override;
     function GetText(const Index: Integer): string;
@@ -123,10 +124,50 @@ begin
   inherited;
 end;
 
-procedure TKey.DrawPicture;
+function TKey.DrawPicture: boolean;
 begin
+result:=false;
 if FPicture<>nil then
-  canvas.copyrect(canvas.ClipRect, FPicture.Canvas, FPicture.Canvas.ClipRect);
+  begin
+    canvas.copyrect(canvas.ClipRect, FPicture.Canvas, FPicture.Canvas.ClipRect);
+    result:=true;
+  end;
+end;
+
+procedure TKey.DrawText;
+var midpos:ShortInt; TextSize: TSize;
+    s, s1: string; p:integer;
+begin
+    with Canvas do
+    begin
+      RoundRect(0,0,width,height,FRound,FRound);
+      font:=FupLabel.Font;
+      TextOut(FUpLabel.PosX, 1, FUpLabel.Caption);
+
+      font:=FDownLabel.Font;
+      TextOut(FDownLabel.PosX, Height-font.Size-13, FDownLabel.Caption);
+
+      font:=FMidLabel.Font;
+      TextSize:=TextExtent(FMidLabel.Caption);
+      if TextSize.cx<Width then
+          begin
+            midPos:=(height div 2) - (font.Size);
+            TextOut(5, midPos, FMidLabel.Caption);
+          end
+      else
+          begin
+            midPos:=((height div 2) + (2 * font.Height));
+            if midPos<0 then midPos:=0;
+
+            s:=FMidLabel.Caption;
+            p:= pos(' ',s);
+            s1:=copy(s,1,p-1);
+            delete(s,1,p);
+            TextOut(5, midPos, s1);
+            midPos:=(height div 2);
+            TextOut(5, midPos, s);
+          end;
+    end;
 end;
 
 procedure TKey.SetText(const Index: Integer; const Value: string);
@@ -215,40 +256,12 @@ begin
 end;
 
 procedure TKey.Paint;
-var midpos:ShortInt; TextSize: TSize;
-    s, s1: string; p:integer;
 begin
-    DrawPicture;
-    with Canvas do
+    if not(DrawPicture) then
     begin
-      RoundRect(0,0,width,height,FRound,FRound);
-      font:=FupLabel.Font;
-      TextOut(FUpLabel.PosX, 1, FUpLabel.Caption);
 
-      font:=FDownLabel.Font;
-      TextOut(FDownLabel.PosX, Height-font.Size-13, FDownLabel.Caption);
-
-      font:=FMidLabel.Font;
-      TextSize:=TextExtent(FMidLabel.Caption);
-      if TextSize.cx<Width then
-          begin
-            midPos:=(height div 2) - (font.Size);
-            TextOut(5, midPos, FMidLabel.Caption);
-          end
-      else
-          begin
-            midPos:=((height div 2) + (2 * font.Height));
-            if midPos<0 then midPos:=0;
-
-            s:=FMidLabel.Caption;
-            p:= pos(' ',s);
-            s1:=copy(s,1,p-1);
-            delete(s,1,p);
-            TextOut(5, midPos, s1);
-            midPos:=(height div 2);
-            TextOut(5, midPos, s);
-          end;
     end;
+
 end;
 
 procedure TKey.ReturnColors;

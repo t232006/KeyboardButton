@@ -33,7 +33,6 @@ type
     procedure MakeBlack;
     procedure ReturnColors;
     procedure DrawPicture;
-    procedure DrawText;
     procedure SetPicture(Value: TBitmap);
     procedure Paint; override;
     function GetText(const Index: Integer): string;
@@ -44,7 +43,6 @@ type
     procedure SetPosX(const Index: Integer; const Value: Integer);
     procedure SetColor(const Value: TColor);
     procedure MidFontChange(Sender: TObject);
-    procedure SetRound(const Value: byte);
   protected
     procedure MouseEnter(var Msg: TMessage); message CM_MOUSEENTER ;
     procedure MouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
@@ -68,7 +66,7 @@ type
     property Color: TColor read FColor write FColor;
     property PressColor: TColor read FPressColor write FPressColor;
     property CurrentColor: TColor write SetColor;
-    property Round: byte read FRound write SetRound default 4;
+    property Round: byte read FRound write FRound default 4;
     property KeyType: TKeyType read FKeyType write FKeyType default ktOthers;
     property UpPosX: Integer index 0 read GetPosX write SetPosX default 5;
     property DownPosX: Integer index 1 read GetPosX write SetPosX;
@@ -128,49 +126,7 @@ end;
 procedure TKey.DrawPicture;
 begin
 if FPicture<>nil then
-  begin
-    //canvas.copyrect(canvas.ClipRect, FPicture.Canvas, FPicture.Canvas.ClipRect);
-    canvas.BrushCopy(Rect(FRound,FRound,Width-FRound,Height-FRound),
-                     FPicture,
-                     FPicture.Canvas.ClipRect,
-                     FPicture.Canvas.Pixels[1,1]);
-  end;
-end;
-
-procedure TKey.DrawText;
-var midpos:ShortInt; TextSize: TSize;
-    s, s1: string; p:integer;
-begin
-    with Canvas do
-    begin
-      RoundRect(0,0,width,height,FRound,FRound);
-      font:=FupLabel.Font;
-      TextOut(FUpLabel.PosX, 1, FUpLabel.Caption);
-
-      font:=FDownLabel.Font;
-      TextOut(FDownLabel.PosX, Height-font.Size-13, FDownLabel.Caption);
-
-      font:=FMidLabel.Font;
-      TextSize:=TextExtent(FMidLabel.Caption);
-      if TextSize.cx<Width then
-          begin
-            midPos:=(height div 2) - (font.Size);
-            TextOut(5, midPos, FMidLabel.Caption);
-          end
-      else
-          begin
-            midPos:=((height div 2) + (2 * font.Height));
-            if midPos<0 then midPos:=0;
-
-            s:=FMidLabel.Caption;
-            p:= pos(' ',s);
-            s1:=copy(s,1,p-1);
-            delete(s,1,p);
-            TextOut(5, midPos, s1);
-            midPos:=(height div 2);
-            TextOut(5, midPos, s);
-          end;
-    end;
+  canvas.copyrect(canvas.ClipRect, FPicture.Canvas, FPicture.Canvas.ClipRect);
 end;
 
 procedure TKey.SetText(const Index: Integer; const Value: string);
@@ -259,11 +215,40 @@ begin
 end;
 
 procedure TKey.Paint;
+var midpos:ShortInt; TextSize: TSize;
+    s, s1: string; p:integer;
 begin
-    //if not(DrawPicture) then
-    DrawText;
-    if Assigned(FPicture) then
     DrawPicture;
+    with Canvas do
+    begin
+      RoundRect(0,0,width,height,FRound,FRound);
+      font:=FupLabel.Font;
+      TextOut(FUpLabel.PosX, 1, FUpLabel.Caption);
+
+      font:=FDownLabel.Font;
+      TextOut(FDownLabel.PosX, Height-font.Size-13, FDownLabel.Caption);
+
+      font:=FMidLabel.Font;
+      TextSize:=TextExtent(FMidLabel.Caption);
+      if TextSize.cx<Width then
+          begin
+            midPos:=(height div 2) - (font.Size);
+            TextOut(5, midPos, FMidLabel.Caption);
+          end
+      else
+          begin
+            midPos:=((height div 2) + (2 * font.Height));
+            if midPos<0 then midPos:=0;
+
+            s:=FMidLabel.Caption;
+            p:= pos(' ',s);
+            s1:=copy(s,1,p-1);
+            delete(s,1,p);
+            TextOut(5, midPos, s1);
+            midPos:=(height div 2);
+            TextOut(5, midPos, s);
+          end;
+    end;
 end;
 
 procedure TKey.ReturnColors;
@@ -314,12 +299,6 @@ begin
       1: FDownLabel.PosX:=Value;
     end;
     Paint;
-end;
-
-procedure TKey.SetRound(const Value: byte);
-begin
-   FRound:=Value;
-   invalidate;
 end;
 
 procedure TKey.MakeBlack;

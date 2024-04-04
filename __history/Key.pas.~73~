@@ -32,7 +32,7 @@ type
     FCurrentColor: TColor;
     procedure MakeBlack;
     procedure ReturnColors;
-    procedure DrawPicture;
+    function DrawPicture: boolean;
     procedure DrawText;
     procedure SetPicture(Value: TBitmap);
     procedure Paint; override;
@@ -125,15 +125,18 @@ begin
   inherited;
 end;
 
-procedure TKey.DrawPicture;
+function TKey.DrawPicture: boolean;
 begin
-if FPicture<>nil then
+result:=false;
+if Assigned(FPicture)  then
   begin
     //canvas.copyrect(canvas.ClipRect, FPicture.Canvas, FPicture.Canvas.ClipRect);
     canvas.BrushCopy(Rect(FRound,FRound,Width-FRound,Height-FRound),
                      FPicture,
                      FPicture.Canvas.ClipRect,
                      FPicture.Canvas.Pixels[1,1]);
+
+    result:=true;
   end;
 end;
 
@@ -260,10 +263,8 @@ end;
 
 procedure TKey.Paint;
 begin
-    //if not(DrawPicture) then
+    if not(DrawPicture) then
     DrawText;
-    if Assigned(FPicture) then
-    DrawPicture;
 end;
 
 procedure TKey.ReturnColors;
