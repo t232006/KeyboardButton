@@ -46,7 +46,6 @@ type
     FPressColor: Tcolor;
     FColor: TColor;
     FCurrentColor: TColor;
-    FInvertPicture: TBitmap;
     //FPictureRect: TRect;
     procedure MakeBlack;
     procedure ReturnColors;
@@ -72,7 +71,6 @@ type
     procedure MouseDown(var Msg: TMessage); message WM_LBUTTONDOWN;
     procedure MouseUp(var Msg: TMessage); message WM_LBUTTONUP;
   public
-
     constructor Create(AOwner: TComponent);  override;
     destructor Destroy; override;
     property OnClick;
@@ -112,7 +110,6 @@ end;
 constructor TKey.Create(AOwner: TComponent);
 begin
   inherited;
-  FInvertPicture:=TBitmap.Create;
   hover:=false;
   FPicture:=TBitmap.Create;
   FUpLabel.Font:=TFont.Create;
@@ -155,30 +152,38 @@ begin
 end;
 
 procedure TKey.DrawPicture;
-//var FInvertPicture: TBitmap;
+var InvertPicture: TBitmap;
 begin
 if FPicture<>nil then
   begin
     //canvas.copyrect(canvas.ClipRect, FPicture.Canvas, FPicture.Canvas.ClipRect);
     if hover then
     begin
-       FInvertPicture:=TBitmap.Create;
-       with FInvertPicture.Canvas do
-       begin
-         FInvertPicture.width:=FPicture.Width;
-         FInvertPicture.height:=FPicture.Height;
-         CopyMode:=cmNotSrcCopy;
-         CopyRect(ClipRect, FPicture.Canvas, FPicture.Canvas.ClipRect);
-       end;
+      if (FCurrentColor=clWhite) then
+        with canvas do
+        begin
+           CopyMode:=cmNotSrcCopy;
+           CopyRect(PictureRect, FPicture.Canvas, FPicture.Canvas.ClipRect);
+        end
+      else
+        with InvertPicture do
+        begin
+           InvertPicture:=TBitmap.Create;
+           Width:=FPicture.Width; Height:=FPicture.Height;
+           Canvas.CopyMode:=cmNotSrcCopy;
+           Canvas.CopyRect(FPicture.Canvas.ClipRect,
+                            FPicture.Canvas,
+                            FPicture.Canvas.ClipRect);
+           Canvas.FloodFill(1,1,clWhite,fsSurface);
 
-
-          canvas.CopyRect(PictureRect,
-                          FInvertPicture.Canvas,
-                          FPicture.Canvas.ClipRect);
-      if (FCurrentColor=FPressColor) then
-          canvas.FloodFill(Fround,Fround,clBlack,fsBorder);
+           self.canvas.copyRect(PictureRect,
+                                  Canvas,
+                                  Canvas.ClipRect);
+           InvertPicture.Destroy;
+        end;
     end
       else
+
     canvas.BrushCopy(PictureRect,
                      FPicture,
                      FPicture.Canvas.ClipRect,

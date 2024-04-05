@@ -46,7 +46,6 @@ type
     FPressColor: Tcolor;
     FColor: TColor;
     FCurrentColor: TColor;
-    FInvertPicture: TBitmap;
     //FPictureRect: TRect;
     procedure MakeBlack;
     procedure ReturnColors;
@@ -72,7 +71,6 @@ type
     procedure MouseDown(var Msg: TMessage); message WM_LBUTTONDOWN;
     procedure MouseUp(var Msg: TMessage); message WM_LBUTTONUP;
   public
-
     constructor Create(AOwner: TComponent);  override;
     destructor Destroy; override;
     property OnClick;
@@ -112,7 +110,6 @@ end;
 constructor TKey.Create(AOwner: TComponent);
 begin
   inherited;
-  FInvertPicture:=TBitmap.Create;
   hover:=false;
   FPicture:=TBitmap.Create;
   FUpLabel.Font:=TFont.Create;
@@ -155,30 +152,10 @@ begin
 end;
 
 procedure TKey.DrawPicture;
-//var FInvertPicture: TBitmap;
 begin
 if FPicture<>nil then
   begin
     //canvas.copyrect(canvas.ClipRect, FPicture.Canvas, FPicture.Canvas.ClipRect);
-    if hover then
-    begin
-       FInvertPicture:=TBitmap.Create;
-       with FInvertPicture.Canvas do
-       begin
-         FInvertPicture.width:=FPicture.Width;
-         FInvertPicture.height:=FPicture.Height;
-         CopyMode:=cmNotSrcCopy;
-         CopyRect(ClipRect, FPicture.Canvas, FPicture.Canvas.ClipRect);
-       end;
-
-
-          canvas.CopyRect(PictureRect,
-                          FInvertPicture.Canvas,
-                          FPicture.Canvas.ClipRect);
-      if (FCurrentColor=FPressColor) then
-          canvas.FloodFill(Fround,Fround,clBlack,fsBorder);
-    end
-      else
     canvas.BrushCopy(PictureRect,
                      FPicture,
                      FPicture.Canvas.ClipRect,
@@ -362,8 +339,7 @@ begin
   begin
     FreeAndNil(FPicturePos);
     FPicturePos:=Value;
-    //DrawPicture;
-    invalidate;
+    DrawPicture;
   end;
 end;
 
@@ -389,10 +365,10 @@ end;
 
 procedure TKey.MakeBlack;
 begin
-   CurrentColor:=ClWhite;
    FUpLabel.Font.Color:=clBlack;
    FDownLabel.Font.Color:=clBlack;
    FMidLabel.Font.Color:=clBlack;
+   CurrentColor:=ClWhite;
    Paint;//(ClWhite);
 end;
 

@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.268,Z:\Программирование\repos\My components\KeyboardButton\Unit1.pas=</Transaction>
     <Transaction>1899.12.30 00:00:00.000.815,=Z:\Программирование\repos\My components\KeyboardButton\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.976,Z:\Программирование\repos\My components\KeyboardButton\Unit1.pas=</Transaction>
     <Transaction>1899.12.30 00:00:00.000.604,=xmlrtl.dcp</Transaction>
     <Transaction>1899.12.30 00:00:00.000.584,Z:\Программирование\repos\keyboardButton.dproj=Z:\Программирование\repos\My components\keyboardButton\keyboardButton.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.976,Z:\Программирование\repos\My components\KeyboardButton\Unit1.pas=</Transaction>
     <Transaction>1899.12.30 00:00:00.000.380,=Z:\Программирование\repos\My components\KeyboardButton\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.268,Z:\Программирование\repos\My components\KeyboardButton\Unit1.pas=</Transaction>
     <Transaction>1899.12.30 00:00:00.000.413,=vcl.dcp</Transaction>
     <Transaction>1899.12.30 00:00:00.000.276,=Z:\Программирование\repos\My components\keyboardKey\Key.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.325,=designide.dcp</Transaction>

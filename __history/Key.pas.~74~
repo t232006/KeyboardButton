@@ -15,28 +15,12 @@ type
     PosX: Integer;
   end;
 
-  TPicturePos = class
-    private
-      FLeft: word;
-      FTop: word;
-      FRight: word;
-      FBottom: word;
-    published
-      property Left: word read FLeft write Fleft;
-      property Top: word read FTop write FTop;
-      property Right: word read FRight write FRight;
-      property Bottom: word read FBottom write FBottom;
-  end;
-
-
   TKey = class(TGraphicControl)
   private
     FKeyType: TKeyType;
     hover: boolean;
     FRound: byte;
     FPicture: TBitmap;
-    FPicturePos: TPicturePos;
-
     FUpLabel: TMyLabel;
     FDownLabel: TMyLabel;
     FMidLabel: TMyLabel;
@@ -46,8 +30,6 @@ type
     FPressColor: Tcolor;
     FColor: TColor;
     FCurrentColor: TColor;
-    FInvertPicture: TBitmap;
-    //FPictureRect: TRect;
     procedure MakeBlack;
     procedure ReturnColors;
     procedure DrawPicture;
@@ -63,16 +45,12 @@ type
     procedure SetColor(const Value: TColor);
     procedure MidFontChange(Sender: TObject);
     procedure SetRound(const Value: byte);
-    function SetPictureRect: TRect;
-    procedure SetPicturePos(const Value: TPicturePos);
-    property PictureRect: TRect read SetPictureRect;
   protected
     procedure MouseEnter(var Msg: TMessage); message CM_MOUSEENTER ;
     procedure MouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
     procedure MouseDown(var Msg: TMessage); message WM_LBUTTONDOWN;
     procedure MouseUp(var Msg: TMessage); message WM_LBUTTONUP;
   public
-
     constructor Create(AOwner: TComponent);  override;
     destructor Destroy; override;
     property OnClick;
@@ -81,8 +59,6 @@ type
 
   published
     property Picture: TBitmap read FPicture write SetPicture;
-    property PicturePos: TPicturePos read FPicturePos write SetPicturePos;
-
     property UpText: string index 0 read GetText write SetText;
     property DownText: string index 1 read GetText  write SetText;
     property MiddleText: string index 2 read GetText write SetText;
@@ -112,7 +88,6 @@ end;
 constructor TKey.Create(AOwner: TComponent);
 begin
   inherited;
-  FInvertPicture:=TBitmap.Create;
   hover:=false;
   FPicture:=TBitmap.Create;
   FUpLabel.Font:=TFont.Create;
@@ -120,9 +95,6 @@ begin
   FMidLabel.Font:=TFont.Create;
   height:=42; width:=42;
   Fround:=4;
-  FPicturePos:=TPicturePos.Create;
-  FPicturePos.Left:=Fround; FPicturePos.Top:=FRound;
-  FPicturePos.Right:=Width-Fround; FPicturePos.Bottom:=Height-FRound;
   FColor:= RGB(49,48,49);
   FPressColor:=RGB(214,186,140);
   CurrentColor:=FColor;
@@ -150,36 +122,15 @@ end;
 destructor TKey.Destroy;
 begin
   FPicture.Destroy;
-  FPicturePos.Destroy;
   inherited;
 end;
 
 procedure TKey.DrawPicture;
-//var FInvertPicture: TBitmap;
 begin
 if FPicture<>nil then
   begin
     //canvas.copyrect(canvas.ClipRect, FPicture.Canvas, FPicture.Canvas.ClipRect);
-    if hover then
-    begin
-       FInvertPicture:=TBitmap.Create;
-       with FInvertPicture.Canvas do
-       begin
-         FInvertPicture.width:=FPicture.Width;
-         FInvertPicture.height:=FPicture.Height;
-         CopyMode:=cmNotSrcCopy;
-         CopyRect(ClipRect, FPicture.Canvas, FPicture.Canvas.ClipRect);
-       end;
-
-
-          canvas.CopyRect(PictureRect,
-                          FInvertPicture.Canvas,
-                          FPicture.Canvas.ClipRect);
-      if (FCurrentColor=FPressColor) then
-          canvas.FloodFill(Fround,Fround,clBlack,fsBorder);
-    end
-      else
-    canvas.BrushCopy(PictureRect,
+    canvas.BrushCopy(Rect(FRound,FRound,Width-FRound,Height-FRound),
                      FPicture,
                      FPicture.Canvas.ClipRect,
                      FPicture.Canvas.Pixels[1,1]);
@@ -356,22 +307,6 @@ begin
    invalidate;
 end;
 
-procedure TKey.SetPicturePos(const Value: TPicturePos);
-begin
-  if Assigned(Value) then
-  begin
-    FreeAndNil(FPicturePos);
-    FPicturePos:=Value;
-    //DrawPicture;
-    invalidate;
-  end;
-end;
-
-function TKey.SetPictureRect: TRect;
-begin
-   result := Rect(FPicturePos.Left, FPicturePos.Top, FPicturePos.Right, FPicturePos.Bottom);
-end;
-
 procedure TKey.SetPosX(const Index, Value: Integer);
 begin
     case Index of
@@ -389,10 +324,10 @@ end;
 
 procedure TKey.MakeBlack;
 begin
-   CurrentColor:=ClWhite;
    FUpLabel.Font.Color:=clBlack;
    FDownLabel.Font.Color:=clBlack;
    FMidLabel.Font.Color:=clBlack;
+   CurrentColor:=ClWhite;
    Paint;//(ClWhite);
 end;
 
