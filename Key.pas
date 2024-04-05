@@ -15,17 +15,24 @@ type
     PosX: Integer;
   end;
 
-  TPicturePos = class
+  TPicturePos = class(TPersistent)
     private
-      FLeft: word;
-      FTop: word;
-      FRight: word;
-      FBottom: word;
+      ALeft: word;
+      ATop: word;
+      ARight: word;
+      ABottom: word;
+      FOnChange: TNotifyEvent;
+      procedure SetBottom(const Value: word);
+      procedure SetLeft(const Value: word);
+      procedure SetRight(const Value: word);
+      procedure SetTop(const Value: word);
+    public
+      property OnChange: TNotifyEvent read FOnChange write FOnChange;
     published
-      property Left: word read FLeft write Fleft;
-      property Top: word read FTop write FTop;
-      property Right: word read FRight write FRight;
-      property Bottom: word read FBottom write FBottom;
+      property Left: word read ALeft write SetLeft;
+      property Top: word read ATop write SetTop;
+      property Right: word read ARight write SetRight;
+      property Bottom: word read ABottom write SetBottom;
   end;
 
 
@@ -62,6 +69,7 @@ type
     procedure SetPosX(const Index: Integer; const Value: Integer);
     procedure SetColor(const Value: TColor);
     procedure MidFontChange(Sender: TObject);
+    procedure PictureFontChange(Sender: TObject);
     procedure SetRound(const Value: byte);
     function SetPictureRect: TRect;
     procedure SetPicturePos(const Value: TPicturePos);
@@ -75,13 +83,14 @@ type
 
     constructor Create(AOwner: TComponent);  override;
     destructor Destroy; override;
+
+
+  published
     property OnClick;
     property OnMouseEnter;
     property OnMouseLeave;
-
-  published
     property Picture: TBitmap read FPicture write SetPicture;
-    property PicturePos: TPicturePos read FPicturePos write SetPicturePos;
+    property PicturePos: TPicturePos read FPicturePos write SetPicturePos stored true;
 
     property UpText: string index 0 read GetText write SetText;
     property DownText: string index 1 read GetText  write SetText;
@@ -145,12 +154,15 @@ begin
   FUpLabel.Font.OnChange := Self.MidFontChange;
   FMidLabel.Font.OnChange := Self.MidFontChange;
   FDownLabel.Font.OnChange := Self.MidFontChange;
+  FPicturePos.OnChange := Self.PictureFontChange;
 end;
 
 destructor TKey.Destroy;
 begin
   FPicture.Destroy;
   FPicturePos.Destroy;
+  FInvertPicture.Destroy;
+
   inherited;
 end;
 
@@ -315,6 +327,11 @@ begin
     DrawPicture;
 end;
 
+procedure TKey.PictureFontChange(Sender: TObject);
+begin
+  paint;
+end;
+
 procedure TKey.ReturnColors;
 begin
    FUpLabel.Font.Color := FSaveUpCol;
@@ -363,7 +380,8 @@ begin
     FreeAndNil(FPicturePos);
     FPicturePos:=Value;
     //DrawPicture;
-    invalidate;
+    //paint;
+    //height:=height+10;    //height:=height-1;
   end;
 end;
 
@@ -400,6 +418,33 @@ end;
 procedure TKey.MidFontChange(Sender: TObject);
 begin
    SetFont(2, FMidLabel.Font);
+end;
+
+{ TPicturePos }
+
+procedure TPicturePos.SetBottom(const Value: word);
+begin
+  ABottom:=Value;
+  if Assigned(FOnChange) then OnChange(self);
+
+end;
+
+procedure TPicturePos.SetLeft(const Value: word);
+begin
+   ALeft:=Value;
+   if Assigned(FOnChange) then OnChange(self);
+end;
+
+procedure TPicturePos.SetRight(const Value: word);
+begin
+   ARight:=Value;
+   if Assigned(FOnChange) then OnChange(self);
+end;
+
+procedure TPicturePos.SetTop(const Value: word);
+begin
+  ATop:=Value;
+   if Assigned(FOnChange) then OnChange(self);
 end;
 
 end.
