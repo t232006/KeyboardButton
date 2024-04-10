@@ -61,6 +61,7 @@ type
     procedure ReturnColors;
     procedure DrawPicture;
     procedure DrawText;
+    procedure SaveFontColors;
     procedure SetPicture(Value: TBitmap);
     procedure Paint; override;
     function GetText(const Index: Integer): string;
@@ -95,6 +96,7 @@ type
     property OnClick;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnMouseMove;
     property ScanCodes: TStringList read FScanCodes write SetScanCodes;
     property Picture: TBitmap read FPicture write SetPicture;
     property PicturePos: TPicturePos read FPicturePos write SetPicturePos stored true;
@@ -249,8 +251,6 @@ begin
         font:=FDownLabel.Font;
         TextOut(FDownLabel.PosX, Height-font.Size-10, FDownLabel.Caption);
       end;
-
-
     end;
 end;
 
@@ -307,33 +307,48 @@ end;
 procedure TKey.MouseDown(var Msg: TMessage);
 begin
    inherited;
-   Pressed:=true;
+   if KeyType<>ktSticked then Pressed:=true else
+   begin
+     pressed:=not(pressed); ReturnColors;
+     if pressed=false then
+      begin
+       SaveFontColors;
+       MakeBlack;
+      end;
+
+   end;
+end;
+
+procedure TKey.MouseUp(var Msg: TMessage);
+begin
+   inherited;
+   if keytype<>ktSticked then pressed:=false
+
+
 end;
 
 procedure TKey.MouseEnter(var Msg: TMessage);
 begin
    inherited;
-   hover:=true;
-   FSaveDoCol:=FDownLabel.Font.Color;
-   FSaveMiCol:=FMidLabel.Font.Color;
-   FSaveUpCol:=FUpLabel.Font.Color;
-   MakeBlack;
+    SaveFontColors;
+   if not(Pressed) then
+   begin
+     hover:=true;
+     MakeBlack;
+   end;
 
 end;
 
 procedure TKey.MouseLeave(var Msg: TMessage);
 begin
   inherited;
-   hover:=false;
-   ReturnColors;
-   CurrentColor:=FColor;
-   Paint;
-end;
-
-procedure TKey.MouseUp(var Msg: TMessage);
-begin
-   inherited;
-   pressed:=false;
+  if not(Pressed) then
+   begin
+     hover:=false;
+     ReturnColors;
+     CurrentColor:=FColor;
+     Paint;
+   end
 end;
 
 procedure TKey.Paint;
@@ -349,6 +364,13 @@ begin
    FUpLabel.Font.Color := FSaveUpCol;
    FDownLabel.Font.Color := FSaveDoCol;
    FMidLabel.Font.Color := FSaveMiCol;
+end;
+
+procedure TKey.SaveFontColors;
+begin
+    FSaveDoCol:=FDownLabel.Font.Color;
+     FSaveMiCol:=FMidLabel.Font.Color;
+     FSaveUpCol:=FUpLabel.Font.Color;
 end;
 
 procedure TKey.SetColor(const Value: TColor);
@@ -391,9 +413,6 @@ begin
   begin
     FreeAndNil(FPicturePos);
     FPicturePos:=Value;
-    //DrawPicture;
-    //paint;
-    //height:=height+10;    //height:=height-1;
   end;
 end;
 

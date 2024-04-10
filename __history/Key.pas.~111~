@@ -40,6 +40,7 @@ type
   private
     FKeyType: TKeyType;
     hover: boolean;
+    FPressed: boolean;
     FRound: byte;
     FPicture: TBitmap;
     FPicturePos: TPicturePos;
@@ -70,23 +71,24 @@ type
     procedure SetPosX(const Index: Integer; const Value: Integer);
     procedure SetColor(const Value: TColor);
     procedure FontChange(Sender: TObject);
-    procedure PictureChange(Sender: TObject);
     procedure SetRound(const Value: byte);
     function SetPictureRect: TRect;
     procedure SetPicturePos(const Value: TPicturePos);
     procedure SetScanCodes(const Value: TStringList);
+    procedure SetPressed(const Value: Boolean);
     property PictureRect: TRect read SetPictureRect;
   protected
     procedure MouseEnter(var Msg: TMessage); message CM_MOUSEENTER ;
     procedure MouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
-    procedure MouseDown(var Msg: TMessage); message WM_LBUTTONDOWN;
-    procedure MouseUp(var Msg: TMessage); message WM_LBUTTONUP;
+    procedure MouseDown(var Msg: TMessage); overload; message WM_LBUTTONDOWN;
+    procedure MouseUp(var Msg: TMessage); overload; message WM_LBUTTONUP;
+
   public
-    Pressed: Boolean;
+
     SaveMiddleText: string;
     constructor Create(AOwner: TComponent);  override;
     destructor Destroy; override;
-
+    property Pressed: Boolean read FPressed write SetPressed;
 
 
   published
@@ -128,6 +130,7 @@ begin
   inherited;
   FInvertPicture:=TBitmap.Create;
   hover:=false;
+  Fpressed:=false;
   FPicture:=TBitmap.Create;
   FUpLabel.Font:=TFont.Create;
   FDownLabel.Font:=TFont.Create;
@@ -159,13 +162,11 @@ begin
   end;
   //FMidLabel.Font:=FUpLabel.Font;
   FKeyType:=ktLetters;
-  FSaveDoCol:=FDownLabel.Font.Color;
-  FSaveMiCol:=FMidLabel.Font.Color;
-  FSaveUpCol:=FUpLabel.Font.Color;
+
   FUpLabel.Font.OnChange := Self.FontChange;
   FMidLabel.Font.OnChange := Self.FontChange;
   FDownLabel.Font.OnChange := Self.FontChange;
-  FPicturePos.OnChange := Self.PictureChange;
+  FPicturePos.OnChange := Self.FontChange;
 end;
 
 destructor TKey.Destroy;
@@ -229,15 +230,13 @@ begin
             midPos:=((height div 2) + (2 * font.Height));
             if midPos<0 then midPos:=0;
 
-            s:=ReverseString(FMidLabel.Caption);  //the last brake
+            s:=FMidLabel.Caption;
             p:= pos(' ',s);
-            s:=ReverseString(s);
-            p:=length(s)-p;
-            s1:=copy(s,1,p+1);
+            s1:=copy(s,1,p-1);
             delete(s,1,p);
-            TextOut(5, midPos, s1);
+            TextOut(4, midPos+1, trim(s1));
             midPos:=(height div 2);
-            TextOut(0, midPos, s);
+            TextOut(4, midPos-1, trim(s));
           end;
       if FUpLabel.Caption<>'' then
       begin
@@ -257,7 +256,7 @@ end;
 
 procedure TKey.FontChange(Sender: TObject);
 begin
-
+   Paint;
 end;
 
 procedure TKey.SetText(const Index: Integer; const Value: string);
@@ -308,33 +307,40 @@ end;
 procedure TKey.MouseDown(var Msg: TMessage);
 begin
    inherited;
-  CurrentColor:=FPressColor;
-  Paint;
+   Pressed:=true;
+end;
+
+procedure TKey.MouseUp(var Msg: TMessage);
+begin
+   inherited;
+   pressed:=false;
 end;
 
 procedure TKey.MouseEnter(var Msg: TMessage);
 begin
    inherited;
-   hover:=true;
-   MakeBlack;
+   FSaveDoCol:=FDownLabel.Font.Color;
+     FSaveMiCol:=FMidLabel.Font.Color;
+     FSaveUpCol:=FUpLabel.Font.Color;
+   if not(Pressed) then
+   begin
+     hover:=true;
+
+     MakeBlack;
+   end;
 
 end;
 
 procedure TKey.MouseLeave(var Msg: TMessage);
 begin
   inherited;
-   hover:=false;
-   ReturnColors;
-   CurrentColor:=FColor;
-   Paint;
-end;
-
-procedure TKey.MouseUp(var Msg: TMessage);
-begin
-   inherited;
-   if hover then MakeBlack else
-   CurrentColor:=Color;
-   Paint;
+  if not(Pressed) then
+   begin
+     hover:=false;
+     ReturnColors;
+     CurrentColor:=FColor;
+     Paint;
+   end;
 end;
 
 procedure TKey.Paint;
@@ -343,11 +349,6 @@ begin
     DrawText;
     if Assigned(FPicture) then
     DrawPicture;
-end;
-
-procedure TKey.PictureChange(Sender: TObject);
-begin
-  paint;
 end;
 
 procedure TKey.ReturnColors;
@@ -415,6 +416,19 @@ begin
       1: FDownLabel.PosX:=Value;
     end;
     Paint;
+end;
+
+procedure TKey.SetPressed(const Value: Boolean);
+begin
+  if FPressed<>Value then
+  begin
+    FPressed := Value;
+    if FPressed=true then
+    CurrentColor:=FPressColor
+    else if hover then MakeBlack else CurrentColor:=Color;
+
+    Paint;
+  end;
 end;
 
 procedure TKey.SetRound(const Value: byte);
