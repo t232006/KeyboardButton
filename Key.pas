@@ -40,6 +40,7 @@ type
   private
     FKeyType: TKeyType;
     hover: boolean;
+    FPressed: boolean;
     FRound: byte;
     FPicture: TBitmap;
     FPicturePos: TPicturePos;
@@ -74,6 +75,7 @@ type
     function SetPictureRect: TRect;
     procedure SetPicturePos(const Value: TPicturePos);
     procedure SetScanCodes(const Value: TStringList);
+    procedure SetPressed(const Value: Boolean);
     property PictureRect: TRect read SetPictureRect;
   protected
     procedure MouseEnter(var Msg: TMessage); message CM_MOUSEENTER ;
@@ -82,13 +84,11 @@ type
     procedure MouseUp(var Msg: TMessage); overload; message WM_LBUTTONUP;
 
   public
-    Pressed: Boolean;
+
     SaveMiddleText: string;
     constructor Create(AOwner: TComponent);  override;
     destructor Destroy; override;
-    procedure MouseDown;  overload;
-    procedure MouseUp;   overload;
-
+    property Pressed: Boolean read FPressed write SetPressed;
 
 
   published
@@ -130,7 +130,7 @@ begin
   inherited;
   FInvertPicture:=TBitmap.Create;
   hover:=false;
-  pressed:=false;
+  Fpressed:=false;
   FPicture:=TBitmap.Create;
   FUpLabel.Font:=TFont.Create;
   FDownLabel.Font:=TFont.Create;
@@ -307,13 +307,7 @@ end;
 procedure TKey.MouseDown(var Msg: TMessage);
 begin
    inherited;
-   MouseDown;
-end;
-
-procedure TKey.MouseDown;
-begin
-   CurrentColor:=FPressColor;
-  Paint;
+   Pressed:=true;
 end;
 
 procedure TKey.MouseEnter(var Msg: TMessage);
@@ -336,17 +330,10 @@ begin
    Paint;
 end;
 
-procedure TKey.MouseUp;
-begin
-   if hover then MakeBlack else
-   CurrentColor:=Color;
-   Paint;
-end;
-
 procedure TKey.MouseUp(var Msg: TMessage);
 begin
    inherited;
-   MouseUp;
+   pressed:=false;
 end;
 
 procedure TKey.Paint;
@@ -422,6 +409,19 @@ begin
       1: FDownLabel.PosX:=Value;
     end;
     Paint;
+end;
+
+procedure TKey.SetPressed(const Value: Boolean);
+begin
+  if FPressed<>Value then
+  begin
+    FPressed := Value;
+    if FPressed=true then
+    CurrentColor:=FPressColor
+    else if hover then MakeBlack else CurrentColor:=Color;
+
+    Paint;
+  end;
 end;
 
 procedure TKey.SetRound(const Value: byte);
