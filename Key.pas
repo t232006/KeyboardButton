@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, Vcl.Controls, Vcl.ExtCtrls, windows,
-  Graphics, messages, stdctrls, consts;
+  Graphics, messages, stdctrls, strUtils;
 
 type
   TKeyType = (ktFunc, ktScroll, ktNum, ktLetters, ktSticked, ktOthers);
@@ -54,6 +54,7 @@ type
     FColor: TColor;
     FCurrentColor: TColor;
     FInvertPicture: TBitmap;
+    FScanCodes: TStringList;
     //FPictureRect: TRect;
     procedure MakeBlack;
     procedure ReturnColors;
@@ -68,27 +69,33 @@ type
     function GetPosX(const Index: Integer): Integer;
     procedure SetPosX(const Index: Integer; const Value: Integer);
     procedure SetColor(const Value: TColor);
-    procedure MidFontChange(Sender: TObject);
-    procedure PictureFontChange(Sender: TObject);
+    procedure FontChange(Sender: TObject);
     procedure SetRound(const Value: byte);
     function SetPictureRect: TRect;
     procedure SetPicturePos(const Value: TPicturePos);
+    procedure SetScanCodes(const Value: TStringList);
     property PictureRect: TRect read SetPictureRect;
   protected
     procedure MouseEnter(var Msg: TMessage); message CM_MOUSEENTER ;
     procedure MouseLeave(var Msg: TMessage); message CM_MOUSELEAVE;
-    procedure MouseDown(var Msg: TMessage); message WM_LBUTTONDOWN;
-    procedure MouseUp(var Msg: TMessage); message WM_LBUTTONUP;
-  public
+    procedure MouseDown(var Msg: TMessage); overload; message WM_LBUTTONDOWN;
+    procedure MouseUp(var Msg: TMessage); overload; message WM_LBUTTONUP;
 
+  public
+    Pressed: Boolean;
+    SaveMiddleText: string;
     constructor Create(AOwner: TComponent);  override;
     destructor Destroy; override;
+    procedure MouseDown;  overload;
+    procedure MouseUp;   overload;
+
 
 
   published
     property OnClick;
     property OnMouseEnter;
     property OnMouseLeave;
+    property ScanCodes: TStringList read FScanCodes write SetScanCodes;
     property Picture: TBitmap read FPicture write SetPicture;
     property PicturePos: TPicturePos read FPicturePos write SetPicturePos stored true;
 
@@ -123,10 +130,12 @@ begin
   inherited;
   FInvertPicture:=TBitmap.Create;
   hover:=false;
+  pressed:=false;
   FPicture:=TBitmap.Create;
   FUpLabel.Font:=TFont.Create;
   FDownLabel.Font:=TFont.Create;
   FMidLabel.Font:=TFont.Create;
+  FScanCodes:=TStringList.Create;
   height:=42; width:=42;
   Fround:=4;
   FPicturePos:=TPicturePos.Create;
@@ -135,8 +144,13 @@ begin
   FColor:= RGB(49,48,49);
   FPressColor:=RGB(214,186,140);
   CurrentColor:=FColor;
-  FMidLabel.Caption:='Esc';
+  //FMidLabel.Caption:='Esc';
   with FUpLabel do
+  begin
+    Font.Size:=14; Font.Color:=clWhite; Font.Style:=[fsItalic];
+    PosX:=5;
+  end;
+  with FMidLabel do
   begin
     Font.Size:=14; Font.Color:=clWhite; Font.Style:=[fsItalic];
     PosX:=5;
@@ -146,15 +160,13 @@ begin
     Font.Size:=12; Font.Color:=clRed; Font.Style:=[];
     PosX:= self.Width-font.Size-5;
   end;
-  FMidLabel.Font:=FUpLabel.Font;
+  //FMidLabel.Font:=FUpLabel.Font;
   FKeyType:=ktLetters;
-  FSaveDoCol:=FDownLabel.Font.Color;
-  FSaveMiCol:=FMidLabel.Font.Color;
-  FSaveUpCol:=FUpLabel.Font.Color;
-  FUpLabel.Font.OnChange := Self.MidFontChange;
-  FMidLabel.Font.OnChange := Self.MidFontChange;
-  FDownLabel.Font.OnChange := Self.MidFontChange;
-  FPicturePos.OnChange := Self.PictureFontChange;
+
+  FUpLabel.Font.OnChange := Self.FontChange;
+  FMidLabel.Font.OnChange := Self.FontChange;
+  FDownLabel.Font.OnChange := Self.FontChange;
+  FPicturePos.OnChange := Self.FontChange;
 end;
 
 destructor TKey.Destroy;
@@ -162,14 +174,14 @@ begin
   FPicture.Destroy;
   FPicturePos.Destroy;
   FInvertPicture.Destroy;
-
+  FScanCodes.Destroy;
   inherited;
 end;
 
 procedure TKey.DrawPicture;
 //var FInvertPicture: TBitmap;
 begin
-if FPicture<>nil then
+if (FPicture<>nil) and (FPicture.Height>0) then
   begin
     //canvas.copyrect(canvas.ClipRect, FPicture.Canvas, FPicture.Canvas.ClipRect);
     if hover then
@@ -204,15 +216,10 @@ var midpos:ShortInt; TextSize: TSize;
 begin
     with Canvas do
     begin
-      RoundRect(0,0,width,height,FRound,FRound);
-      font:=FupLabel.Font;
-      TextOut(FUpLabel.PosX, 1, FUpLabel.Caption);
-
-      font:=FDownLabel.Font;
-      TextOut(FDownLabel.PosX, Height-font.Size-13, FDownLabel.Caption);
 
       font:=FMidLabel.Font;
       TextSize:=TextExtent(FMidLabel.Caption);
+      if FMidLabel.Caption<>'' then
       if TextSize.cx<Width then
           begin
             midPos:=(height div 2) - (font.Size);
@@ -227,11 +234,29 @@ begin
             p:= pos(' ',s);
             s1:=copy(s,1,p-1);
             delete(s,1,p);
-            TextOut(5, midPos, s1);
+            TextOut(4, midPos+1, trim(s1));
             midPos:=(height div 2);
-            TextOut(5, midPos, s);
+            TextOut(4, midPos-1, trim(s));
           end;
+      if FUpLabel.Caption<>'' then
+      begin
+        font:=FupLabel.Font;
+        TextOut(FUpLabel.PosX, 1, FUpLabel.Caption);
+      end;
+
+      if FDownLabel.Caption<>'' then
+      begin
+        font:=FDownLabel.Font;
+        TextOut(FDownLabel.PosX, Height-font.Size-10, FDownLabel.Caption);
+      end;
+
+
     end;
+end;
+
+procedure TKey.FontChange(Sender: TObject);
+begin
+   Paint;
 end;
 
 procedure TKey.SetText(const Index: Integer; const Value: string);
@@ -239,24 +264,15 @@ begin
    case index of
       0:   //up
       begin
-        if Value<>'' then
-        SetText(2, '');
         FUpLabel.Caption:=Value;
       end;
       1:    //down
       begin
-         if Value<>'' then
-        SetText(2, '');
          FDownLabel.Caption:=Value;
       end;
       2:
       begin
          FMidLabel.Caption:=Value;
-          if Value<>'' then
-            begin
-              SetText(0, '');
-              SetText(1, '');
-            end;
       end;
     end;
     Paint;//(Color);
@@ -291,7 +307,12 @@ end;
 procedure TKey.MouseDown(var Msg: TMessage);
 begin
    inherited;
-  CurrentColor:=FPressColor;
+   MouseDown;
+end;
+
+procedure TKey.MouseDown;
+begin
+   CurrentColor:=FPressColor;
   Paint;
 end;
 
@@ -299,7 +320,11 @@ procedure TKey.MouseEnter(var Msg: TMessage);
 begin
    inherited;
    hover:=true;
+   FSaveDoCol:=FDownLabel.Font.Color;
+   FSaveMiCol:=FMidLabel.Font.Color;
+   FSaveUpCol:=FUpLabel.Font.Color;
    MakeBlack;
+
 end;
 
 procedure TKey.MouseLeave(var Msg: TMessage);
@@ -311,25 +336,25 @@ begin
    Paint;
 end;
 
-procedure TKey.MouseUp(var Msg: TMessage);
+procedure TKey.MouseUp;
 begin
-   inherited;
    if hover then MakeBlack else
    CurrentColor:=Color;
    Paint;
 end;
 
+procedure TKey.MouseUp(var Msg: TMessage);
+begin
+   inherited;
+   MouseUp;
+end;
+
 procedure TKey.Paint;
 begin
-    //if not(DrawPicture) then
+    canvas.RoundRect(0,0,width,height,FRound,FRound);
     DrawText;
     if Assigned(FPicture) then
     DrawPicture;
-end;
-
-procedure TKey.PictureFontChange(Sender: TObject);
-begin
-  paint;
 end;
 
 procedure TKey.ReturnColors;
@@ -405,6 +430,11 @@ begin
    invalidate;
 end;
 
+procedure TKey.SetScanCodes(const Value: TStringList);
+begin
+  FScanCodes.Assign(Value);
+end;
+
 procedure TKey.MakeBlack;
 begin
    CurrentColor:=ClWhite;
@@ -412,12 +442,6 @@ begin
    FDownLabel.Font.Color:=clBlack;
    FMidLabel.Font.Color:=clBlack;
    Paint;//(ClWhite);
-end;
-
-
-procedure TKey.MidFontChange(Sender: TObject);
-begin
-   SetFont(2, FMidLabel.Font);
 end;
 
 { TPicturePos }
