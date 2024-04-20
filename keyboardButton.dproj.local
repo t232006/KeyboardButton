@@ -1,18 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>1899.12.30 00:00:00.000.268,Z:\Программирование\repos\My components\KeyboardButton\Unit1.pas=</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.028,=Z:\Программирование\repos\My components\keyboardButton\Key.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.604,=xmlrtl.dcp</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.380,=Z:\Программирование\repos\My components\KeyboardButton\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.976,Z:\Программирование\repos\My components\KeyboardButton\Unit1.pas=</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.815,=Z:\Программирование\repos\My components\KeyboardButton\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.940,=rtl.dcp</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.276,=Z:\Программирование\repos\My components\keyboardKey\Key.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.325,=designide.dcp</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.466,=vclactnband.dcp</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.413,=vcl.dcp</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.584,Z:\Программирование\repos\My components\keyboardButton\keyboardButton.dproj=Z:\Программирование\repos\keyboardButton.dproj</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.520,=vclx.dcp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.199,=vcl.dcp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.326,=xmlrtl.dcp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.287,=Z:\Программирование\repos\My components\KeyboardButton\key.bmp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.105,Z:\Программирование\repos\KeyboardButton.dproj=Z:\Программирование\repos\My components\KeyboardButton\keyboardButton.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.537,=rtl.dcp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.231,=vclactnband.dcp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.172,=designide.dcp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.292,=vclx.dcp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.113,=Z:\Программирование\repos\My components\KeyboardButton\key.pas</Transaction>
   </Transactions>
 </BorlandProject>
