@@ -56,6 +56,7 @@ type
     FCurrentColor: TColor;
     FInvertPicture: TBitmap;
     FScanCodes: TStringList;
+    FPictureColor: TColor;
     FOnColorChange: TNotifyEvent;
     //FPictureRect: TRect;
     procedure MakeBlack;
@@ -65,6 +66,7 @@ type
     procedure SaveFontColors;
     procedure SetPicture(Value: TBitmap);
     procedure Paint; override;
+    function ContrastColor(AColor: TColor): TColor;
     function GetText(const Index: Integer): string;
     procedure SetText(const Index: Integer; const Value: string);
     function GetFont(const Index: Integer): TFont;
@@ -78,6 +80,7 @@ type
     procedure SetPicturePos(const Value: TPicturePos);
     procedure SetScanCodes(const Value: TStringList);
     procedure SetPressed(const Value: Boolean);
+    procedure SetPictureColor(const Value: TColor);
     property PictureRect: TRect read SetPictureRect;
     property OnColorChange: TNotifyEvent read FOnColorChange write FOnColorChange;
   protected
@@ -90,10 +93,11 @@ type
 
     SaveMiddleText: string;
     HidePicture: boolean;
-    active: boolean;
+    //active: boolean;
     constructor Create(AOwner: TComponent);  override;
     destructor Destroy; override;
     property Pressed: Boolean read FPressed write SetPressed;
+    procedure DoConstrast;
 
 
   published
@@ -121,6 +125,7 @@ type
     property UpPosX: Integer index 0 read GetPosX write SetPosX default 5;
     property DownPosX: Integer index 1 read GetPosX write SetPosX;
     property MidPosX: Integer index 2 read GetPosX write SetPosX;
+    property PictureColor: TColor read FPictureColor write SetPictureColor;
   end;
 
 procedure Register;
@@ -134,12 +139,22 @@ end;
 
 { TKey }
 
+function TKey.ContrastColor(AColor: TColor): TColor;
+const TolerSq = 16 * 16;
+begin
+ if Sqr(GetRValue(AColor) - $80) + Sqr(GetGValue(AColor) - $80)
+  + Sqr(GetBValue(AColor) - $80) < TolerSq then
+  Result := (AColor + $7F7F7F) and $FFFFFF
+ else
+  Result := AColor xor $FFFFFF;
+end;
+
 constructor TKey.Create(AOwner: TComponent);
 begin
   inherited;
   FInvertPicture:=TBitmap.Create;
   hover:=false;
-  active:=true;
+  //active:=true;
   hidePicture:=false;
   Fpressed:=false;
   FPicture:=TBitmap.Create;
@@ -189,6 +204,13 @@ begin
   inherited;
 end;
 
+procedure TKey.DoConstrast;
+begin
+  UpFont.Color:=ContrastColor(Color);
+  MiddleFont.Color:=ContrastColor(Color);
+  DownFont.Color:=ContrastColor(Color);
+end;
+
 procedure TKey.DrawPicture;
 //var FInvertPicture: TBitmap;
 begin
@@ -211,13 +233,14 @@ if (FPicture<>nil) and (FPicture.Height>0) then
                           FInvertPicture.Canvas,
                           FPicture.Canvas.ClipRect);
       if (FCurrentColor=FPressColor) then
-          canvas.FloodFill(Fround,Fround,clBlack,fsBorder);
+        canvas.FloodFill(Fround, Fround, clWhite, fsSurface);
     end
       else
     canvas.BrushCopy(PictureRect,
                      FPicture,
                      FPicture.Canvas.ClipRect,
                      FPicture.Canvas.Pixels[1,1]);
+    //SetPictureColor(FPictureColor);
   end;
 end;
 
@@ -316,8 +339,8 @@ end;
 
 procedure TKey.MouseDown(var Msg: TMessage);
 begin
-   if active then
-   begin
+   //if active then
+   //begin
      inherited;
      if KeyType<>ktSticked then Pressed:=true else
      begin
@@ -328,24 +351,24 @@ begin
          MakeBlack;
         end;
      end;
-   end;
+   //end;
 end;
 
 procedure TKey.MouseUp(var Msg: TMessage);
 begin
-   if active then
-   begin
+   //if active then
+   //begin
      inherited;
      if keytype<>ktSticked then pressed:=false
-   end;
+   //end;
 
 
 end;
 
 procedure TKey.MouseEnter(var Msg: TMessage);
 begin
-   if active then
-   begin
+   //if active then
+   //begin
      inherited;
       SaveFontColors;
      if not(Pressed) then
@@ -353,14 +376,14 @@ begin
        hover:=true;
        MakeBlack;
      end;
-   end;
+   //end;
 
 end;
 
 procedure TKey.MouseLeave(var Msg: TMessage);
 begin
-  if active then
-   begin
+  //if active then
+  // begin
     inherited; hover:=false;
     if not(Pressed) then
      begin
@@ -369,7 +392,7 @@ begin
        CurrentColor:=FColor;
        Paint;
      end
-   end;
+   //end;
 end;
 
 procedure TKey.Paint;
@@ -433,6 +456,25 @@ procedure TKey.SetPicture(Value: TBitmap);
 begin
    FPicture.Assign(Value);
    invalidate;
+end;
+
+procedure TKey.SetPictureColor(const Value: TColor);
+var i,j:word;
+begin
+
+    with FPicture.Canvas do
+    begin
+    for i := 0 to FPicture.Width do
+    for j := 0 to FPicture.Height do
+      if Pixels[i,j]=clBlack then Continue else
+      Pixels[i,j]:=Value;
+
+    //Brush.Color:=ResColor;
+    //FloodFill(i,j, clWhite, fsSurface);
+    end;
+    DrawPicture;
+  FPictureColor := Value;
+
 end;
 
 procedure TKey.SetPicturePos(const Value: TPicturePos);
